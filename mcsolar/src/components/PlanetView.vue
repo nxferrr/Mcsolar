@@ -126,7 +126,7 @@ const selectLevel = (level: PlanetLevel) => {
         <div class="level-visualization" :style="{ backgroundColor: selectedLevel.color || planet.color }">
           <div class="depth-layers">
             <div 
-              v-for="l in planetLevels.filter(l => l.depth <= selectedLevel.depth)" 
+              v-for="l in planetLevels.filter(l => ((selectedLevel?.depth ?? -1) >= l.depth))"
               :key="l.id"
               class="depth-layer"
               :style="{ backgroundColor: l.color || planet.color }"

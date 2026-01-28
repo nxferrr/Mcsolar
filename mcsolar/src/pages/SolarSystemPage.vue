@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { Cartesian3, Math as CesiumMath, Color } from 'cesium';
 import spaceBgImage from '@/assets/fond.png';
 import Spacecraft from '@/components/Spacecraft.vue';
 import PlanetTerritories from '@/components/PlanetTerritories.vue';
@@ -474,8 +475,8 @@ onUnmounted(() => {
           'hidden': currentViewState === 'planet'
         }"
         :style="{
-          left: `${planet.x}px`,
-          top: `${planet.y}px`,
+          left: `${planet.x + planet.size / 2}px`,
+          top: `${planet.y + planet.size / 2}px`,
           width: `${planet.size}px`,
           height: `${planet.size}px`,
           backgroundColor: planet.color
@@ -561,24 +562,37 @@ onUnmounted(() => {
 .solar-system-page {
   width: 100vw;
   height: 100vh;
-  position: relative;
   overflow: hidden;
-  background: #06060c;
+  background-color: #000;
+  position: relative;
 }
 
-.universe {
-  width: var(--w); 
-  height: var(--h);
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+.map-container {
+  width: 100%;
+  height: 100%;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-origin: center center;
-  transform: translate(-50%, -50%) translate(var(--x), var(--y)) scale(var(--s));
-  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform;
-  cursor: crosshair;
+  top: 0;
+  left: 0;
+}
+
+.game-world {
+  position: relative;
+  /* background-color: #000; Remove fixed color to let Cesium handle it */
+}
+
+.cesium-viewer-canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* Ensure Cesium canvas fits */
+:deep(.cesium-viewer) {
+  width: 100%;
+  height: 100%;
 }
 
 .planet-hotspot {
@@ -594,6 +608,7 @@ onUnmounted(() => {
   width: 150px;
   height: 124px;
   min-width: 80px;
+  transform: translate(-50%, -50%);
 }
 
 .planet-hotspot.disabled {
@@ -623,7 +638,7 @@ onUnmounted(() => {
   border-color: #fff;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
   z-index: 10;
-  transform: scale(1.05);
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 .planet-name {
